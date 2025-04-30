@@ -52,13 +52,16 @@ def root():
 def nearest(lon: float, lat: float, k: int = 2):
     """Find nearest service lines, dynamically handling multiple service lines at same address."""
     distances, indices = tree.query([(lon, lat)], k=k)
-    first_idx = indices[0]
-    target_address = gdf.iloc[first_idx]["Address"]
-    
-    results = []
 
-    # Look up all rows with the same address
+    # Fix: Ensure first_idx is a single row index
+    if isinstance(indices[0], (np.integer, int)):
+        first_idx = indices[0]
+    else:
+        first_idx = indices[0][0]
+
+    target_address = gdf.iloc[first_idx]["Address"]
     matching_indices = address_to_indices.get(target_address, [])
+
 
     if len(matching_indices) > 1:
         # Multiple service lines at this address: return them all
