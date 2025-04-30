@@ -61,7 +61,7 @@ def nearest(lon: float, lat: float, k: int = 2):
 
     target_address = gdf.iloc[first_idx]["Address"]
     matching_indices = address_to_indices.get(target_address, [])
-
+    results= []
 
     if len(matching_indices) > 1:
         # Multiple service lines at this address: return them all
