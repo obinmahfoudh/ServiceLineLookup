@@ -68,28 +68,30 @@ def nearest(lon: float, lat: float, k: int = 2):
         for idx in matching_indices:
             row = gdf.iloc[idx]
             results.append({
-                "address": row["Address"],
-                "public_material": row["PWS-Owned Service Line Material"],
-                "private_material": row["Customer Side Service Line Material"],
-                "public_verification": row["Source of Information Used for Service Line Identification - PWS Side"],
-                "private_verification": row["Source of Information Used for Service Line Identification - Customer"],
-                "latitude": row.geometry.y,
-                "longitude": row.geometry.x,
-                "distance": 0.0  # Assume same location
+                "address": str(row["Address"]),
+                "public_material": str(row["PWS-Owned Service Line Material"]),
+                "private_material": str(row["Customer Side Service Line Material"]),
+                "public_verification": str(row["Source of Information Used for Service Line Identification - PWS Side"]),
+                "private_verification": str(row["Source of Information Used for Service Line Identification - Customer"]),
+                "latitude": float(row.geometry.y),
+                "longitude": float(row.geometry.x),
+                "distance": 0.0
             })
+
     else:
         # Only a single service line: return top k nearest
         for dist, idx in zip(distances, indices):
             row = gdf.iloc[idx]
             results.append({
-                "address": row["Address"],
-                "public_material": row["PWS-Owned Service Line Material"],
-                "private_material": row["Customer Side Service Line Material"],
-                "public_verification": row["Source of Information Used for Service Line Identification - PWS Side"],
-                "private_verification": row["Source of Information Used for Service Line Identification - Customer"],
-                "latitude": row.geometry.y,
-                "longitude": row.geometry.x,
-                "distance": dist
+                "address": str(row["Address"]),
+                "public_material": str(row["PWS-Owned Service Line Material"]),
+                "private_material": str(row["Customer Side Service Line Material"]),
+                "public_verification": str(row["Source of Information Used for Service Line Identification - PWS Side"]),
+                "private_verification": str(row["Source of Information Used for Service Line Identification - Customer"]),
+                "latitude": float(row.geometry.y),
+                "longitude": float(row.geometry.x),
+                "distance": float(dist)
             })
+
 
     return {"nearest_lines": results}
