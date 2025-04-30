@@ -49,7 +49,6 @@ def root():
     return {"message": "Service Line API is running."}
 
 @app.get("/nearest")
-@app.get("/nearest")
 def nearest(lon: float, lat: float, k: int = 2):
     """Find nearest service lines, dynamically handling multiple service lines at same address."""
     distances, indices = tree.query([(lon, lat)], k=k)
