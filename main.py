@@ -53,6 +53,18 @@ for idx, address in enumerate(gdf["Address"]):
 # Store the GeoDataFrame too for lookup
 gdf.reset_index(inplace=True)
 
+# Haversine distance for better distance calculations, return feet for user clarity
+def haversine_feet(lon1, lat1, lon2, lat2):
+    R = 6371.0  # Earth radius in kilometers
+    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = np.sin(dlat / 2.0)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+    distance_km = R * c
+    distance_ft = distance_km * 3280.84  # Convert km to feet
+    return distance_ft
+
 @app.get("/")
 def root():
     return {"message": "Service Line API is running."}
@@ -73,13 +85,13 @@ def nearest(lon: float, lat: float, k: int = 2):
 
     # Get unique addresses and their distance 
     addresses = []
-    distance_fixed= []
+    #distance_fixed= []
     for index in indices:
         address = gdf.iloc[index]["Address"]
         if address not in addresses:
             addresses.append(address)
-            distance = index_to_distance.get(index, 0.0)
-            distance_fixed.append(distance)
+            #distance = index_to_distance.get(index, 0.0)
+            #distance_fixed.append(distance)
         # Make sure its k unique addresses
         if len(addresses) >= k:
             break
@@ -111,7 +123,7 @@ def nearest(lon: float, lat: float, k: int = 2):
                 "private_verification": str(row["Source of Information Used for Service Line Identification - Customer"]),
                 "latitude": float(row.geometry.y),
                 "longitude": float(row.geometry.x),
-                "distance": float(distance_fixed[addresses.index(row["Address"])])
+                "distance": float(haversine_feet(row.geometry.x, row.geometry.y, lon, lat))
             })
 
     return {"nearest_lines": results}
