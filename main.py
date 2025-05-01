@@ -21,7 +21,7 @@ app.add_middleware(
 
 # Load service line points and create CDK tree
 print("Loading service lines...")
-gdf = gpd.read_file("var/data/service_line.geojson")
+gdf = gpd.read_file("/var/data/service_line.geojson")
 # lon, lat
 coords = np.array(list(zip(gdf.geometry.x, gdf.geometry.y)))  
 important_columns = [
