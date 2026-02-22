@@ -1,12 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 import asyncpg
 import os
 
 # Use the Transaction Pooler URL (Port 6543) from Supabase settings
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-app = FastAPI()
+# Startup and Shutdown commands
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    app.state.pool = await asyncpg.create_pool(DATABASE_URL)    
+    yield
+    # Shutdown
+    await app.state.pool.close()
+
+app = FastAPI(lifespan = lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,18 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# We use a connection pool so we don't open/close connections constantly
-@app.on_event("startup")
-async def startup():
-    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
-
-@app.on_event("shutdown")
-async def shutdown():
-    await app.state.pool.close()
-
 @app.get("/")
 async def root():
-    return {"message": "Service Line API is running via PostGIS."}
+    return {"message": "Service Line API is running"}
 
 @app.get("/nearest")
 async def nearest(lon: float, lat: float, k: int = 2):
