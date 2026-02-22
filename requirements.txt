@@ -1,5 +1,3 @@
 fastapi
 uvicorn
-geopandas
-scipy
-shapely
+asyncpg
