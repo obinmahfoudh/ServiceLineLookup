@@ -63,7 +63,7 @@ async def nearest(lon: float, lat: float, k: int = 2):
                 l."Source of Information Used for Service Line Identification - Cu",
                 ST_X(l.geometry::geometry) as lon,
                 ST_Y(l.geometry::geometry) as lat,
-                ST_Distance(l.geometry, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) * 3.28084 as dist_ft
+                ST_Distance(l.geometry, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) 
             FROM locations l
             JOIN unique_addresses ua ON l."Address" = ua."Address"
             ORDER BY dist_ft ASC;
