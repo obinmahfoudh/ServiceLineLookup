@@ -59,8 +59,8 @@ async def nearest(lon: float, lat: float, k: int = 2):
                 l."PWS-Owned Service Line Material",
                 l."Customer Side Service Line Material",
                 l."Classification for Entire Service Line",
-                l."Source of Information Used for Service Line Identification - PWS Side",
-                l."Source of Information Used for Service Line Identification - Customer",
+                l."Source of Information Used for Service Line Identification - PW",
+                l."Source of Information Used for Service Line Identification - Cu",
                 ST_X(l.geometry::geometry) as lon,
                 ST_Y(l.geometry::geometry) as lat,
                 ST_Distance(l.geometry, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) * 3.28084 as dist_ft
@@ -80,8 +80,8 @@ async def nearest(lon: float, lat: float, k: int = 2):
                 "public_material": str(row["PWS-Owned Service Line Material"]),
                 "private_material": str(row["Customer Side Service Line Material"]),
                 "classification for entire service line": str(row["Classification for Entire Service Line"]),
-                "public_verification": str(row["Source of Information Used for Service Line Identification - PWS Side"]),
-                "private_verification": str(row["Source of Information Used for Service Line Identification - Customer"]),
+                "public_verification": str(row["Source of Information Used for Service Line Identification - PW"]),
+                "private_verification": str(row["Source of Information Used for Service Line Identification - Cu"]),
                 "latitude": float(row["lat"]),
                 "longitude": float(row["lon"]),
                 "distance": float(row["dist"])
