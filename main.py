@@ -43,26 +43,31 @@ async def nearest(lon: float, lat: float, k: int = 2):
         # 3. ST_Distance calculates the distance in METERS
         query = """
             WITH unique_addresses AS (
-                SELECT DISTINCT "Address"
-                FROM locations
-                ORDER BY geometry <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+                SELECT "Address", 
+                       -- We calculate the distance here so ORDER BY can see it
+                       geometry <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography as dist
+                FROM (
+                    SELECT DISTINCT "Address", geometry 
+                    FROM locations
+                ) sub
+                ORDER BY dist
                 LIMIT $3
             )
             SELECT 
-                "Address",
-                "Gooseneck/ Pigtail",
-                "PWS-Owned Service Line Material",
-                "Customer Side Service Line Material",
-                "Classification for Entire Service Line",
-                "Source of Information Used for Service Line Identification - PWS Side",
-                "Source of Information Used for Service Line Identification - Customer",
-                ST_Y(geometry::geometry) as lat,
-                ST_X(geometry::geometry) as lon,
-                ST_Distance(geometry, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) as dist
-            FROM locations
-            WHERE "Address" IN (SELECT "Address" FROM unique_addresses)
+                l."Address",
+                l."Gooseneck/ Pigtail",
+                l."PWS-Owned Service Line Material",
+                l."Customer Side Service Line Material",
+                l."Classification for Entire Service Line",
+                l."Source of Information Used for Service Line Identification - PWS Side",
+                l."Source of Information Used for Service Line Identification - Customer",
+                ST_X(l.geometry::geometry) as lon,
+                ST_Y(l.geometry::geometry) as lat,
+                ST_Distance(l.geometry, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) * 3.28084 as dist_ft
+            FROM locations l
+            JOIN unique_addresses ua ON l."Address" = ua."Address"
             ORDER BY dist_ft ASC;
-        """
+            """
         
         rows = await conn.fetch(query, lon, lat, k)
         
