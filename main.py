@@ -68,9 +68,10 @@ async def nearest(lon: float, lat: float, k: int = 2):
             JOIN unique_addresses ua ON l."Address" = ua."Address"
             ORDER BY dist_ft ASC;
             """
-        
+        print(f"DEBUG: Searching for Lon: {lon}, Lat: {lat}, K: {k}")
         rows = await conn.fetch(query, lon, lat, k)
-        
+        print(f"DEBUG: Database returned {len(rows)} rows")
+
         results = []
         for row in rows:
             results.append({
